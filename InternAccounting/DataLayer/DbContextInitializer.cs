@@ -17,10 +17,22 @@ namespace InternAccounting.DataLayer
 
         public static async void InitializeDbContext(AppDbContext dbContext)
         {
-            dbContext.Database.EnsureCreated();
-            dbContext.Database.Migrate();
-            dbContext.Directions.Add(new Entities.DirectionEntity {Title = "Разработка"});
-            Console.WriteLine(dbContext.Interns);
+            try
+            {
+                if (dbContext.Database.GetPendingMigrations().Any())
+                {
+                    dbContext.Database.Migrate();
+                }
+            }
+            catch (PostgresException ex) when (ex.SqlState == "42P07")
+            {
+                Console.WriteLine($"Table already exists: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while initializing the database: {ex.Message}");
+                throw;
+            }
         }
     }
 }
