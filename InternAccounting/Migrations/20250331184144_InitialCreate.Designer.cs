@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace InternAccounting.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250330101018_CreateEnumGender")]
-    partial class CreateEnumGender
+    [Migration("20250331184144_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,8 +23,31 @@ namespace InternAccounting.Migrations
                 .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "gender", new[] { "male", "female", "other" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("InternAccounting.DataLayer.Entities.DirectionEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("SlotsCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Directions");
+                });
 
             modelBuilder.Entity("InternAccounting.DataLayer.Entities.InternEntity", b =>
                 {
@@ -61,8 +84,9 @@ namespace InternAccounting.Migrations
                     b.Property<int?>("ProjectId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Sex")
-                        .HasColumnType("integer");
+                    b.Property<string>("Sex")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)");
 
                     b.HasKey("Id");
 
@@ -71,30 +95,6 @@ namespace InternAccounting.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Interns");
-                });
-
-            modelBuilder.Entity("InternAccounting.DataLayer.Entities.InternshipDirectionEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("SlotsCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Directions");
                 });
 
             modelBuilder.Entity("InternAccounting.DataLayer.Entities.ProjectEntity", b =>
@@ -123,7 +123,7 @@ namespace InternAccounting.Migrations
 
             modelBuilder.Entity("InternAccounting.DataLayer.Entities.InternEntity", b =>
                 {
-                    b.HasOne("InternAccounting.DataLayer.Entities.InternshipDirectionEntity", "Direction")
+                    b.HasOne("InternAccounting.DataLayer.Entities.DirectionEntity", "Direction")
                         .WithMany("Interns")
                         .HasForeignKey("DirectionId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -138,7 +138,7 @@ namespace InternAccounting.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("InternAccounting.DataLayer.Entities.InternshipDirectionEntity", b =>
+            modelBuilder.Entity("InternAccounting.DataLayer.Entities.DirectionEntity", b =>
                 {
                     b.Navigation("Interns");
                 });

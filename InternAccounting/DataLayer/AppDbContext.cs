@@ -19,14 +19,11 @@ namespace InternAccounting.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
             modelBuilder.Entity<InternEntity>()
                 .Property(e => e.Sex)
-                .HasConversion<string>()
-                .HasColumnType("varchar(10)");
-
-            var sexConverter = new ValueConverter<Gender, string>(
-                s => s.ToString(),
-                s => (Gender)Enum.Parse(typeof(Gender),s));
+                .HasConversion<string>() 
+                .HasColumnType("varchar(10)"); 
 
             var emailConverter = new ValueConverter<Email, string>(
                 email => email.ToString(), 
