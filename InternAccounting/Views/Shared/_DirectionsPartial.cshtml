@@ -1,0 +1,121 @@
+﻿@using InternAccounting.BusinessLayer.DataTransferObjects.Direction
+@model TablesViewModel
+
+<div class="p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Список направлений</h4>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDirectionModal">
+            <i class="bi bi-plus-circle-fill me-2"></i>Добавить направление
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <!-- Заголовок таблицы -->
+            <thead class="table-light">
+                <tr>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th>Стажеры</th>
+                    <th>Слоты</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <!-- Тело таблицы -->
+            <tbody>
+                @foreach (var direction in Model.Directions)
+                {
+                    <tr>
+                        <td>@direction.Title</td>
+                        <td>@direction.Description</td>
+                        <td>
+                            <button class="btn btn-sm btn-info"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#interns-@direction.Id">
+                                @direction.InternsCount
+                            </button>
+                            <div class="collapse" id="interns-@direction.Id">
+                                @foreach (var intern in direction.Interns)
+                                {
+                                    <div class="p-2 border-bottom">
+                                        @intern.FullName
+                                        <small class="text-muted">@intern.Email</small>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-success">@direction.SlotsCount</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary edit-direction"
+                                    data-id="@direction.Id"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editDirectionModal">
+                                <i class="bi bi-pencil-fill"></i> Редактировать
+                            </button>
+                            <form asp-controller="Tables" asp-action="DeleteDirection" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@direction.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Вы уверены, что хотите удалить это направление?')">
+                                    <i class="bi bi-trash-fill"></i> Удалить
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Пагинация -->
+    <nav>
+        <ul class="pagination justify-content-center">
+            @if (Model.Directions.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-activeTab="directions"
+                       asp-route-pageNumber="@(Model.Directions.PageIndex - 1)">
+                        &laquo;
+                    </a>
+                </li>
+            }
+
+            @for (var i = 1; i <= Model.Directions.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Directions.PageIndex ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-activeTab="directions"
+                       asp-route-pageNumber="@i">@i</a>
+                </li>
+            }
+
+            @if (Model.Directions.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-activeTab="directions"
+                       asp-route-pageNumber="@(Model.Directions.PageIndex + 1)">
+                        &raquo;
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+@section Styles{
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  
+    </script>
+}

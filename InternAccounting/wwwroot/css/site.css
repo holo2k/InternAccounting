@@ -1,0 +1,72 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.bg-light-blue {
+    background-color: #e8f0fe;
+}
+
+.nav-tabs .nav-link {
+    color: #495057;
+    font-weight: 500;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    margin-right: 5px;
+}
+
+    .nav-tabs .nav-link.active {
+        color: #0d47a1;
+        background-color: white;
+        border-bottom: 3px solid #0d47a1;
+        font-weight: 600;
+    }
+
+    .nav-tabs .nav-link:not(.active):hover {
+        background-color: rgba(255, 255, 255, 0.4);
+    }
+
+.table-hover tbody tr:hover {
+    background-color: #f0f7ff;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+}
+
+.card {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tab-content {
+    background-color: white;
+    border-radius: 0 0 8px 8px;
+}
+
+.card-header {
+    border-bottom: none;
+}
+
+.modal-header {
+    border-radius: 0;
+}

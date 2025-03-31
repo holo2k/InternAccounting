@@ -1,0 +1,84 @@
+﻿@using InternAccounting.BusinessLayer.DataTransferObjects.Intern
+@model AddInternViewModel
+
+<input type="hidden" asp-for="Id" id="Intern_Id" />
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" id="AddIntern_FirstName" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" id="AddIntern_LastName" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" id="AddIntern_Email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" id="AddIntern_PhoneNumber" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label asp-for="Sex" class="form-label"></label>
+            <select asp-for="Sex" asp-items="Html.GetEnumSelectList<Gender>()" class="form-select" id="AddIntern_Sex">
+                <option value="">Выберите пол</option>
+            </select>
+            <span asp-validation-for="Sex" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label asp-for="BirthDate" class="form-label"></label>
+            <input asp-for="BirthDate"
+                   type="date"
+                   class="form-control"
+                   id="AddIntern_BirthDate"
+                   min="1920-01-01"
+                   max="2010-12-31"
+                   value="2000-01-01"/>
+            <span asp-validation-for="BirthDate" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label asp-for="DirectionId" class="form-label"></label>
+            <select asp-for="DirectionId" asp-items="Model.Directions" class="form-select" id="AddIntern_DirectionId">
+                <option value="">Не выбрано</option>
+            </select>
+            <a href="../Tables" class="btn btn-link">Добавить новое направление</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="ProjectId" class="form-label"></label>
+            <select asp-for="ProjectId" asp-items="Model.Projects" class="form-select" id="AddIntern_ProjectId">
+                <option value="">Не выбрано</option>
+            </select>
+            <a href="../Tables" class="btn btn-link">Добавить новый проект</a>
+        </div>
+    </div>
+</div>

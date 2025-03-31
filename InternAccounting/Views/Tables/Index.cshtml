@@ -1,0 +1,519 @@
+﻿@model TablesViewModel
+
+<form id="activeTabForm" method="get" style="display: none;">
+    <input type="hidden" name="activeTab" id="globalActiveTab" value="@Model.ActiveTab" />
+</form>
+
+<div class="container-fluid py-4 bg-light-blue">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary mb-0">
+                <i class="bi bi-kanban-fill me-2"></i>Направления и проекты
+            </h2>
+        </div>
+    </div>
+</div>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+<div class="container mt-4">
+   
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @(Model.ActiveTab == "directions" ? "active" : "")"
+                            id="directions-tab" data-bs-toggle="tab" data-bs-target="#directions"
+                            type="button" role="tab" aria-controls="directions"
+                            aria-selected="@(Model.ActiveTab == "directions" ? "true" : "false")">
+                        <i class="bi bi-compass-fill me-2"></i>Направления
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @(Model.ActiveTab == "projects" ? "active" : "")"
+                            id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects"
+                            type="button" role="tab" aria-controls="projects"
+                            aria-selected="@(Model.ActiveTab == "projects" ? "true" : "false")">
+                        <i class="bi bi-kanban-fill me-2"></i>Проекты
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="tab-content" id="myTabContent">
+                <!-- Вкладка направлений -->
+                <div class="tab-pane fade @(Model.ActiveTab == "directions" ? "show active" : "")"
+                     id="directions" role="tabpanel" aria-labelledby="directions-tab">
+                    <partial name="_DirectionsPartial" model="Model" />
+                </div>
+
+                <!-- Вкладка проектов -->
+                <div class="tab-pane fade @(Model.ActiveTab == "projects" ? "show active" : "")"
+                     id="projects" role="tabpanel" aria-labelledby="projects-tab">
+                    <partial name="_ProjectsPartial" model="Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно создания направления -->
+<div class="modal" id="createDirectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Добавить направление</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Tables" asp-action="Index" asp-  method="post">
+                <input asp-for="ActiveTab" type="hidden" name="activeTab" value="directions" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label asp-for="NewDirection.Title" class="form-label"></label>
+                        <input asp-for="NewDirection.Title" class="form-control" required>
+                        <span asp-validation-for="NewDirection.Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NewDirection.Description" class="form-label"></label>
+                        <textarea asp-for="NewDirection.Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="NewDirection.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NewDirection.SlotsCount" class="form-label"></label>
+                        <input asp-for="NewDirection.SlotsCount" type="number" class="form-control" required>
+                        <span asp-validation-for="NewDirection.SlotsCount" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно редактирования направления -->
+<div class="modal" id="editDirectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Редактировать направление</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Tables" asp-action="Index" method="post">
+                <input type="hidden" asp-for="EditDirectionId" id="EditDirectionId" name="EditDirectionId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Название</label>
+                        <input asp-for="NewDirection.Title" id="EditDirectionTitle" name="NewDirection.Title" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea asp-for="NewDirection.Description" id="EditDirectionDescription" name="NewDirection.Description" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Количество слотов</label>
+                        <input asp-for="NewDirection.SlotsCount" id="EditDirectionSlotsCount" name="NewDirection.SlotsCount" type="number" class="form-control" required>
+                    </div>
+
+                    <input type="hidden" asp-for="SelectedDirecitonInternIds" id="selectedDirectionInternsInput" />
+                    <div class="mb-3">
+                        <label class="form-label">Привязанные стажеры</label>
+                        <div class="border p-3 rounded" style="max-height: 300px; overflow-y: auto;"
+                             id="attachedInternsContainer"
+                             data-selected-input="selectedDirectionInternsInput"
+                             data-selector="selectedDirectionInternsInput">
+                            
+                            <!-- Здесь будут отображаться привязанные стажеры -->
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Доступные стажеры</label>
+                        <div class="border p-3 rounded" style="max-height: 300px; overflow-y: auto;" id="availableInternsContainer">
+                            <!-- Здесь будут отображаться доступные стажеры -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" class="btn btn-primary" id="saveDirectionBtn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно создания проекта -->
+<div class="modal" id="createProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Добавить проект</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Tables" asp-action="Index" method="post">
+                <input asp-for="ActiveTab" type="hidden" name="activeTab" value="projects" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label asp-for="NewProject.Title" class="form-label"></label>
+                        <input asp-for="NewProject.Title" class="form-control" required>
+                        <span asp-validation-for="NewProject.Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NewProject.Description" class="form-label"></label>
+                        <textarea asp-for="NewProject.Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="NewProject.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NewProject.SlotsCount" class="form-label"></label>
+                        <input asp-for="NewProject.SlotsCount" type="number" class="form-control" required>
+                        <span asp-validation-for="NewProject.SlotsCount" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно редактирования проекта -->
+<div class="modal" id="editProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Редактировать проект</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Tables" asp-action="Index" method="post">
+                <input type="hidden" asp-for="EditProjectId" id="EditProjectId" name="EditProjectId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Название</label>
+                        <input asp-for="NewProject.Title" id="EditProjectTitle" name="NewProject.Title" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea asp-for="NewProject.Description" id="EditProjectDescription" name="NewProject.Description" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Количество слотов</label>
+                        <input asp-for="NewProject.SlotsCount" id="EditProjectSlotsCount" name="NewProject.SlotsCount" type="number" class="form-control" required>
+                    </div>
+
+                    <input type="hidden" asp-for="SelectedProjectInternIds" id="selectedProjectInternsInput" />
+                    <div class="mb-3">
+                        <label class="form-label">Привязанные стажеры</label>
+                        <div class="border p-3 rounded" style="max-height: 300px; overflow-y: auto;"
+                             id="attachedInternsContainer"
+                             data-selected-input="selectedDirectionInternsInput"
+                             data-selector="selectedDirectionInternsInput">
+
+                            <!-- Здесь будут отображаться привязанные стажеры -->
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Доступные стажеры</label>
+                        <div class="border p-3 rounded" style="max-height: 300px; overflow-y: auto;" id="availableInternsContainer">
+                            <!-- Здесь будут отображаться доступные стажеры -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" class="btn btn-primary" id="saveProjectBtn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        /* ОБЩИЕ ФУНКЦИИ ДЛЯ ОБОИХ МОДАЛЬНЫХ ОКОН */
+
+        document.getElementById('saveDirectionBtn').addEventListener('click', async function () {
+            // 1. Собираем ID привязанных стажеров
+            const attachedInterns = Array.from(document.querySelectorAll('#attachedInternsContainer [data-intern-id]'))
+                .map(el => el.dataset.internId);
+
+            // 2. Обновляем скрытое поле с SelectedInternIds
+            document.getElementById('selectedDirectionInternsInput').value = attachedInterns.join(',');
+
+            // 3. Получаем форму и данные
+            const form = document.querySelector('#editDirectionModal form');
+            const formData = new FormData(form);
+
+            // 4. Отправляем данные на сервер
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                });
+
+                if (response.ok) {
+                    // Закрываем модальное окно и обновляем страницу
+                    bootstrap.Modal.getInstance(document.getElementById('editDirectionModal')).hide();
+                    window.location.reload();
+                } else {
+                    alert('Ошибка при сохранении');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при отправке данных');
+            }
+        });
+
+        document.getElementById('saveProjectBtn').addEventListener('click', async function () {
+            // 1. Собираем ID привязанных стажеров
+            const attachedInterns = Array.from(document.querySelectorAll('#attachedInternsContainer [data-intern-id]'))
+                .map(el => el.dataset.internId);
+
+            // 2. Обновляем скрытое поле с SelectedInternIds
+            document.getElementById('selectedProjectInternsInput').value = attachedInterns.join(',');
+
+            // 3. Получаем форму и данные
+            const form = document.querySelector('#editProjectModal form');
+            const formData = new FormData(form);
+
+            // 4. Отправляем данные на сервер
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                });
+
+                if (response.ok) {
+                    // Закрываем модальное окно и обновляем страницу
+                    bootstrap.Modal.getInstance(document.getElementById('editProjectModal')).hide();
+                    window.location.reload();
+                } else {
+                    alert('Ошибка при сохранении');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при отправке данных');
+            }
+        });
+
+
+        // Функция создания элемента стажера (общая для обоих окон)
+        function createInternElement(intern) {
+            const div = document.createElement('div');
+            div.className = 'd-flex justify-content-between align-items-center p-2 mb-2 border rounded';
+            div.dataset.internId = intern.id;
+            div.draggable = true;
+
+            div.innerHTML = `
+                <div>
+                    <strong>${intern.fullName}</strong>
+                    <small class="text-muted d-block">${intern.email}</small>
+                </div>
+                <i class="bi bi-arrow-left-right"></i>
+            `;
+
+            return div;
+        }
+
+        // Обработчик начала перетаскивания (общий)
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.internId);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        /* ЛОГИКА ДЛЯ НАПРАВЛЕНИЙ (DIRECTIONS) */
+
+        document.querySelectorAll('.edit-direction').forEach(btn => {
+            btn.addEventListener('click', async function () {
+                const id = this.dataset.id;
+                try {
+                    const response = await fetch(`/Tables/GetDirection?id=${id}`);
+                    if (!response.ok) throw new Error('Ошибка загрузки данных');
+
+                    const direction = await response.json();
+
+                    // Получаем элементы внутри модального окна направлений
+                    const modal = document.getElementById('editDirectionModal');
+                    const availableContainer = modal.querySelector('#availableInternsContainer');
+                    const attachedContainer = modal.querySelector('#attachedInternsContainer');
+
+                    // Очищаем контейнеры
+                    availableContainer.innerHTML = '';
+                    attachedContainer.innerHTML = '';
+
+                    // Заполняем основные поля
+                    document.getElementById('EditDirectionId').value = direction.id;
+                    document.getElementById('EditDirectionTitle').value = direction.title;
+                    document.getElementById('EditDirectionDescription').value = direction.description;
+                    document.getElementById('EditDirectionSlotsCount').value = direction.slotsCount;
+
+                    // Загрузка стажеров
+                    const allInternsResponse = await fetch('/Interns/GetAll');
+                    const allInterns = await allInternsResponse.json();
+
+                    // Разделяем на доступных и привязанных
+                    const availableInterns = allInterns.filter(ai =>
+                        !direction.interns.some(di => di.id === ai.id));
+
+                    // Добавляем стажеров в контейнеры
+                    availableInterns.forEach(intern => {
+                        const element = createInternElement(intern);
+                        element.addEventListener('dragstart', handleDragStart);
+                        availableContainer.appendChild(element);
+                    });
+
+                    direction.interns.forEach(intern => {
+                        const element = createInternElement(intern);
+                        element.addEventListener('dragstart', handleDragStart);
+                        attachedContainer.appendChild(element);
+                    });
+
+                    // Обновляем скрытое поле
+                    document.getElementById('selectedDirectionInternsInput').value =
+                        direction.interns.map(i => i.id).join(',');
+
+                    // Показываем модальное окно
+                    new bootstrap.Modal(modal).show();
+
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Не удалось загрузить данные направления');
+                }
+            });
+        });
+
+        /* ЛОГИКА ДЛЯ ПРОЕКТОВ (PROJECTS) */
+
+        document.querySelectorAll('.edit-project').forEach(btn => {
+            btn.addEventListener('click', async function () {
+                const id = this.dataset.id;
+                try {
+                    const response = await fetch(`/Tables/GetProject?id=${id}`);
+                    if (!response.ok) throw new Error('Ошибка загрузки данных');
+
+                    const project = await response.json();
+
+                    // Получаем элементы внутри модального окна проектов
+                    const modal = document.getElementById('editProjectModal');
+                    const availableContainer = modal.querySelector('#availableInternsContainer');
+                    const attachedContainer = modal.querySelector('#attachedInternsContainer');
+
+                    // Очищаем контейнеры
+                    availableContainer.innerHTML = '';
+                    attachedContainer.innerHTML = '';
+
+                    // Заполняем основные поля
+                    document.getElementById('EditProjectId').value = project.id;
+                    document.getElementById('EditProjectTitle').value = project.title;
+                    document.getElementById('EditProjectDescription').value = project.description;
+                    document.getElementById('EditProjectSlotsCount').value = project.slotsCount;
+
+                    // Загрузка стажеров
+                    const allInternsResponse = await fetch('/Interns/GetAll');
+                    const allInterns = await allInternsResponse.json();
+
+                    // Разделяем на доступных и привязанных
+                    const availableInterns = allInterns.filter(ai =>
+                        !project.interns.some(di => di.id === ai.id));
+
+                    // Добавляем стажеров в контейнеры
+                    availableInterns.forEach(intern => {
+                        const element = createInternElement(intern);
+                        element.addEventListener('dragstart', handleDragStart);
+                        availableContainer.appendChild(element);
+                    });
+
+                    project.interns.forEach(intern => {
+                        const element = createInternElement(intern);
+                        element.addEventListener('dragstart', handleDragStart);
+                        attachedContainer.appendChild(element);
+                    });
+
+                    // Обновляем скрытое поле
+                    document.getElementById('selectedProjectInternsInput').value =
+                        project.interns.map(i => i.id).join(',');
+
+                    // Показываем модальное окно
+                    new bootstrap.Modal(modal).show();
+
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Не удалось загрузить данные проекта');
+                }
+            });
+        });
+
+        /* ОБРАБОТЧИКИ DRAG&DROP ДЛЯ ОБОИХ ОКОН */
+
+        function setupDragAndDrop(modalId) {
+            const modal = document.getElementById(modalId);
+            const containers = modal.querySelectorAll('#attachedInternsContainer, #availableInternsContainer');
+
+            containers.forEach(container => {
+                container.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                });
+
+                container.addEventListener('drop', e => {
+                    e.preventDefault();
+                    const internId = e.dataTransfer.getData('text/plain');
+                    const internElement = document.querySelector(`[data-intern-id="${internId}"]`);
+
+                    if (internElement && !container.contains(internElement)) {
+                        container.appendChild(internElement);
+                        // Обновляем соответствующее скрытое поле
+                        const inputId = modalId === 'editDirectionModal'
+                            ? 'selectedDirectionInternsInput'
+                            : 'selectedProjectInternsInput';
+                        const attachedInterns = Array.from(
+                            modal.querySelectorAll('#attachedInternsContainer [data-intern-id]')
+                        ).map(el => el.dataset.internId);
+                        document.getElementById(inputId).value = attachedInterns.join(',');
+                    }
+                });
+            });
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function () {
+            setupDragAndDrop('editDirectionModal');
+            setupDragAndDrop('editProjectModal');
+        });
+    </script>
+}

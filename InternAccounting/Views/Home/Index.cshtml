@@ -1,0 +1,57 @@
+﻿@*
+    Home/Index.cshtml
+*@
+
+<div class="container-fluid py-5 bg-light-blue">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h1 class="display-4 fw-bold text-primary mb-4">Учёт стажёров</h1>
+            <p class="lead text-muted mb-5">Профессиональная система управления стажировками и практикантами</p>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">О системе</h2>
+                </div>
+                <div class="card-body">
+                    <p>Система "Учёт стажёров" разработана для автоматизации процессов управления стажировками в вашей компании. Наше решение позволяет:</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Вести полный учёт всех стажёров</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Распределять стажёров по проектам и направлениям</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Оценивать эффективность работы</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Генерировать автоматические отчёты</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Упростить процесс адаптации новых стажёров</li>
+                    </ul>
+                    <div class="alert alert-primary mt-4">
+                        <i class="bi bi-info-circle-fill me-2"></i> Для начала работы перейдите в раздел "Стажёры" или "Направления и Проекты" в верхнем меню.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .bg-light-blue {
+            background-color: #e8f0fe;
+        }
+
+        .card {
+            transition: transform 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+        .list-unstyled li {
+            padding: 0.3rem 0;
+        }
+    </style>
+}

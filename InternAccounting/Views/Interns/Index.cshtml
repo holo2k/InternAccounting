@@ -1,0 +1,142 @@
+﻿@model InternsViewModel
+
+<div class="container-fluid py-4 bg-light-blue">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary mb-0">
+                <i class="bi bi-people-fill me-2"></i>Список стажёров
+            </h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#internModal">
+                <i class="bi bi-plus-circle-fill me-2"></i>Добавить стажёра
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <!-- Фильтры -->
+            <div class="p-4 border-bottom">
+                <form asp-controller="Interns" asp-action="Index" method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <select asp-for="Filter.DirectionId" asp-items="Model.Directions" class="form-select">
+                            <option value="">Все направления</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select asp-for="Filter.ProjectId" asp-items="Model.Projects" class="form-select">
+                            <option value="">Все проекты</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select asp-for="Filter.Gender" asp-items="Model.Genders" class="form-select">
+                            <option value="">Любой пол</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex">
+                        <button type="submit" class="btn btn-primary me-2">Применить</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Сбросить</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Таблица стажёров -->
+            <partial name="_InternTablePartial" model="Model" />
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="internModalEdit" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="internModalLabel">Редактировать стажёра</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Interns" asp-action="Edit" method="post" id="internForm">
+                <input type="hidden" asp-for="AddIntern.Id" id="EditIntern_Id" name="id" />
+                <div class="modal-body">
+                    <partial name="_CreateInternPartial" model="new AddInternViewModel(){Projects = Model.Projects, Directions = Model.Directions}" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="internModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="internModalLabel">Добавить стажёра</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Interns" asp-action="Create" method="post" id="internForm">
+                <input type="hidden" asp-for="AddIntern.Id" id="AddIntern_Id" />
+                <input type="hidden" name="Id" id="Intern_Id" />
+                <div class="modal-body">
+                    <partial name="_CreateInternPartial" model="new AddInternViewModel(){Projects = Model.Projects, Directions = Model.Directions}" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+   
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.edit-intern').forEach(btn => {
+                btn.addEventListener('click', async function () {
+                    const id = this.dataset.id;
+                    console.log("Редактирование стажёра:", id);
+
+                    try {
+                        const response = await fetch(`/Interns/GetInternForEdit/${id}`);
+
+                        if (!response.ok) {
+                            throw new Error('Ошибка при загрузке данных');
+                        }
+
+                        const data = await response.json();
+
+                        // Заполняем форму
+                        document.getElementById('EditIntern_Id').value = data.id;
+                        document.getElementById('AddIntern_FirstName').value = data.firstName;
+                        document.getElementById('AddIntern_LastName').value = data.lastName;
+                        document.getElementById('AddIntern_Email').value = data.email;
+                        document.getElementById('AddIntern_PhoneNumber').value = data.phoneNumber || '';
+                        document.getElementById('AddIntern_BirthDate').value = data.birthDate || '';
+                        document.getElementById('AddIntern_Sex').value = data.sex || '';
+
+                        // Принудительное обновление dropdown
+                        document.getElementById('AddIntern_DirectionId').value = data.directionId || '';
+                        document.getElementById('AddIntern_ProjectId').value = data.projectId || '';
+
+                        // Показываем модальное окно
+                        new bootstrap.Modal(document.getElementById('internModalEdit')).show();
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                        alert('Произошла ошибка при загрузке данных стажёра');
+                    }
+                });
+            });
+        });
+
+
+    </script>
+}

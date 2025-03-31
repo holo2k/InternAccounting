@@ -1,0 +1,123 @@
+﻿@using InternAccounting.BusinessLayer.DataTransferObjects.Project
+@model TablesViewModel
+
+<div class="p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Список проектов</h4>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+            <i class="bi bi-plus-circle-fill me-2"></i>Добавить проект
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th>Стажеры</th>
+                    <th>Слоты</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var project in Model.Projects)
+                {
+                    <tr>
+                        <td>@project.Title</td>
+                        <td>@project.Description</td>
+                        <td>
+                            <button class="btn btn-sm btn-info"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#interns-@project.Id">
+                                @project.InternsCount
+                            </button>
+                            <div class="collapse" id="interns-@project.Id">
+                                @foreach (var intern in project.Interns)
+                                {
+                                    {
+                                        <div class="p-2 border-bottom">
+                                            @intern.FullName
+                                            <small class="text-muted">@intern.Email</small>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-success">@project.SlotsCount</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary edit-project"
+                                    data-id="@project.Id"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editProjectModal">
+                                <i class="bi bi-pencil-fill"></i> Редактировать
+                            </button>
+                            <form asp-controller="Tables" asp-action="DeleteProject" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@project.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Вы уверены, что хотите удалить этот проект?')">
+                                    <i class="bi bi-trash-fill">Удалить</i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Пагинация -->
+    <nav>
+
+
+        <ul class="pagination justify-content-center">
+            @if (Model.Projects.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-activeTab="projects"
+                       asp-route-pageNumber="@(Model.Projects.PageIndex - 1)">
+                        &laquo;
+                    </a>
+                </li>
+            }
+
+            @for (var i = 1; i <= Model.Projects.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Projects.PageIndex ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-activeTab="projects"
+                       asp-route-pageNumber="@i">@i</a>
+                </li>
+            }
+
+            @if (Model.Projects.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-activeTab="projects"
+                       asp-route-pageNumber="@(Model.Projects.PageIndex + 1)">
+                        &raquo;
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+        </script>
+}
